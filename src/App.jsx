@@ -10,6 +10,7 @@ import AutoBooking from "./Pages/AutoBooking";
 import Profile from "./Pages/Profile";
 import Welcome from "./Pages/Welcome";
 import Greetings from "./Pages/Greetings";
+//import  NewDashboard  from "./Pages/NewDashboard";
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 const App=()=>{
@@ -35,6 +36,7 @@ const App=()=>{
       <Route path="/profile" element={<Profile/>}></Route>
       <Route path="/welcome" element={<Welcome/>}></Route>
       <Route path="/greetings" element={<Greetings/>}></Route>
+
     </Routes>
     </div>
     <ToastContainer/>

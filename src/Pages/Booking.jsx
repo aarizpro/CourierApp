@@ -4,6 +4,7 @@ import Barcode from 'react-barcode';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import courierImg1 from'../assets/rkaylogo.png';
 import amazon from '../assets/amazon.jpeg';
 import aramex from '../assets/aramex.png';
@@ -27,6 +28,8 @@ const Booking = () => {
   const printRef = useRef();
   const { courierImg, courierName, courierSite } = location.state || {}; // Destructure the received state
   const messageTxt = 'Thank you.. Further Tracking Details Please visit ' + courierSite;
+  const cDate1 = new Date();
+  const fDate1 = `${cDate1.getDate()}/${cDate1.getMonth() + 1}/${cDate1.getFullYear()}`;
   const [date, setDate] = useState(new Date().toISOString().split('T')[0]);
   const [awbNo, setAwbNo] = useState('');
   const [senderMobile, setSenderMobile] = useState('');
@@ -58,7 +61,7 @@ const Booking = () => {
   
   const fetchMobno = async () => {
     try {
-      const response = await axios.get(`${url}api/customer/search?field=custMob&value=${senderMobile}`);
+      const response = await axios.get(`${url}api/customer/search?field[]=custMob&value[]=${senderMobile}`);
       setFromAddr(response.data[0].custAddr); // Ensure default value if response data is empty
       setSenderName(response.data[0].custName);
       setFromPincode(response.data[0].custPincode);
@@ -75,7 +78,7 @@ const Booking = () => {
   };
   const fetchRMobno = async () => {
     try {
-      const response = await axios.get(`${url}api/customer/search?field=custMob&value=${receiverMobile}`);
+      const response = await axios.get(`${url}api/customer/search?field[]=custMob&value[]=${receiverMobile}`);
       setToAddr(response.data[0].custAddr); // Ensure default value if response data is empty
       setReceiverName(response.data[0].custName);
       setToPincode(response.data[0].custPincode);
@@ -313,21 +316,29 @@ const Booking = () => {
    }
    const downloadImage = async() => {
     if (printRef.current) {
-     await html2canvas(printRef.current)
-        .then((canvas) => {
-          const dataUrl = canvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.download = 'booking-details.png';
-          link.href = dataUrl;
-          link.click();
-          toast.success('Downloaded');
-        })
-        .catch((error) => {
-          console.error('Failed to generate image:', error);
-          toast.error('Failed to download the image');
+      try {
+        // Capture the HTML element as a canvas
+        const canvas = await html2canvas(printRef.current);
+        const imgData = canvas.toDataURL('image/png');
+  
+        // Create a new PDF document
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: [168, 100] // Postcard size: 100mm x 148mm
         });
+  
+        // Add the image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, 168, 100); // Fit image to postcard size
+  
+        // Save the PDF
+        pdf.save('booking-details.pdf');
+        toast.success('Downloaded');
+      } catch (error) {
+        console.error('Failed to generate PDF:', error);
+        toast.error('Failed to download the PDF');
+      }
     }
-    
   }
   const generateImage = async () => {
     const url1="https://awsupload.onrender.com/";
@@ -367,11 +378,15 @@ const Booking = () => {
 
   
   const handleAwb = (e) => {
-    setAwbNo(e.target.value);
+    const value = e.target.value;
+    setAwbNo(value);
+    if (value.length > 0) {
+      fetchAwb(); // Fetch the AWB to validate if it is unique
+    }
   };
   const fetchAwb = async () => {
     try {
-      const response = await axios.get(`${url}api/booking/search?field=airwayBill&value=${awbNo}`);
+      const response = await axios.get(`${url}api/booking/search?field[]=airwayBill&value[]=${awbNo}`);
       if (response.data.length > 0) {
         
         setIsButtonVisible(false);
@@ -380,9 +395,11 @@ const Booking = () => {
         setIsButtonVisible(true);
       }
     } catch (error) {
-      console.log(error);
+      console.error('Error checking AWB:', error);
+      toast.error('Error fetching AWB data');
     }
   };
+
 
   useEffect(() => {
     if (awbNo) {
@@ -589,7 +606,7 @@ const Booking = () => {
         )}
         </div>
       <div className="p-4 ">
-      <div ref={printRef}  className="border p-4 rounded shadow-md bg-white">
+      <div ref={printRef}  className="border p-4 rounded  bg-white">
         <div className="grid grid-cols-3 gap-4 items-center mb-4">
           <img src={courierImg1} alt="Agency Logo" className="h-16"   />
           <div className="flex justify-center items-center">
@@ -600,7 +617,7 @@ const Booking = () => {
         </div>
 
         <div className="grid grid-cols-3 gap-4 mb-4 text-lg font-semibold">
-          <div>Date: {new Date().toLocaleDateString()}</div>
+          <div>Date: {fDate1}</div>
           
         </div>
 

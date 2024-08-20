@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DataTable from 'react-data-table-component';
+import Papa from 'papaparse';
 import { toast } from 'react-toastify';
 
 const AddAutoawb = () => {
@@ -9,15 +10,16 @@ const AddAutoawb = () => {
   const [courierNames, setCourierNames] = useState([]);
   const [awbStatus, setAwbStatus] = useState("Pending");
   const [data, setData] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [file, setFile] = useState(null); // State to hold selected file
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [isButtonVisible, setIsButtonVisible] = useState(true);
-  const url ="https://api-services-jg4f.onrender.com/";
+  //const url = "https://api-services-jg4f.onrender.com/";
+  const url = "http://localhost:5000/";
   useEffect(() => {
     fetchData();
     fetchCourierNames();
   }, []);
+
   const fetchCourierNames = async () => {
     try {
       const response = await axios.get(`${url}api/courier`);
@@ -26,6 +28,7 @@ const AddAutoawb = () => {
       console.error('Error fetching courier names:', error);
     }
   };
+
   const fetchData = async () => {
     try {
       const response = await axios.get(`${url}api/autoawb`);
@@ -35,91 +38,92 @@ const AddAutoawb = () => {
       toast.error('Failed to fetch data');
     }
   };
+
   const handleAwb = (e) => {
     setAirwayBill(e.target.value);
   };
-  const fetchAwb = async () => {
-    try {
-      const response = await axios.get(`${url}api/autoawb/search?field=airwayBill&value=${airwayBill}`);
-      if (response.data.length > 0) {
-        
-        setIsButtonVisible(false);
-        toast.error('AWB Already Entered. Enter New Awb');
-      } else {
-        setIsButtonVisible(true);
-      }
-    } catch (error) {
-      console.log(error);
-    }
-  };
-  useEffect(() => {
-    if (airwayBill) {
-      fetchAwb();
-    }
-  
-  }, [airwayBill]);
 
-
-  const saveOrUpdateAirway = async (e) => {
-    e.preventDefault();
-    if (airwayBill === "" || courierName === "" || awbStatus === "") {
-      alert("Enter all Fields");
+  const uploadCSV = () => {
+    if (!file) {
+      toast.error("Please choose a CSV file");
       return;
     }
 
-    setIsLoading(true);
-
-    try {
-      if (isEditing) {
-        // Update existing record
-        await axios.put(`${url}api/autoawb/${editingId}`, {
-          airwayBill,
-          courierName,
-          awbStatus
-        });
-        toast.success(`Updated ${airwayBill} Successfully`);
-      } else {
-        // Create new record
-        await axios.post(`${url}api/autoawb`, {
-          airwayBill,
-          courierName,
-          awbStatus
-        });
-        toast.success(`Saved ${airwayBill} Successfully`);
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async function (results) {
+        const csvData = results.data;
+        try {
+          await axios.post(`${url}api/autoawb/upload`, csvData); // Endpoint to handle CSV data
+          toast.success("File uploaded successfully");
+          fetchData(); // Refresh the DataTable after upload
+        } catch (error) {
+          toast.error("Error uploading CSV data");
+          console.error(error);
+        }
       }
-
-      // Reset form and state
-      setAirwayBill("");
-      setAwbStatus("Pending");
-      setIsLoading(false);
-      setIsEditing(false);
-      setEditingId(null);
-      fetchData(); // Refresh the table data
-    } catch (error) {
-      toast.error(error.message);
-      console.log(error);
-      setIsLoading(false);
-    }
+    });
   };
-
-  const editAirway = (row) => {
-    setAirwayBill(row.airwayBill);
-    setCourierName(row.courierName);
-    setAwbStatus(row.awbStatus);
-    setIsEditing(true);
-    setEditingId(row._id);
-  };
-
   const deleteAirway = async (id) => {
     try {
-      await axios.delete(`${url}api/autoawb/${id}`);
-      toast.success('Deleted Successfully');
-      fetchData(); // Refresh the table data after deletion
+      await axios.delete(`${url}api/autoawb/${id}`); // Assuming DELETE request works like this
+      toast.success("Record deleted successfully");
+      fetchData(); // Refresh data after deletion
     } catch (error) {
-      toast.error('Failed to delete');
-      console.log(error);
+      toast.error("Error deleting record");
+      console.error(error);
     }
   };
+  const editAirway = (row) => {
+    setIsEditing(true); // Enable editing mode
+    setEditingId(row._id); // Store the ID of the item being edited
+    setAirwayBill(row.airwayBill); // Populate the form with the selected record
+    setCourierName(row.courierName);
+    setAwbStatus(row.awbStatus);
+  };  
+  const saveRecord = async () => {
+    const record = {
+      airwayBill,
+      courierName,
+      awbStatus,
+    };
+  
+    // Check for duplicates in the frontend data array
+    const duplicate = data.some((item) => item.airwayBill === airwayBill);
+    if (duplicate) {
+      toast.error("Duplicate Airway Bill detected");
+      return;
+    }
+  
+    try {
+      if (isEditing) {
+        // If editing mode, update the record
+        await axios.put(`${url}api/autoawb/${editingId}`, record); // Assuming PUT endpoint
+        toast.success("Record updated successfully");
+      } else {
+        // If not editing, save a new record
+        await axios.post(`${url}api/autoawb/save`, record);
+        toast.success("Record saved successfully");
+      }
+  
+      fetchData(); // Refresh DataTable
+      // Clear form fields after saving
+      setAirwayBill("");
+      
+      setAwbStatus("Pending");
+      setIsEditing(false); // Exit editing mode
+      setEditingId(null); // Clear editing ID
+    } catch (error) {
+      if (error.response && error.response.status === 409) {
+        toast.error("Airway Bill already exists");
+      } else {
+        toast.error("Error saving record");
+      }
+      console.error(error);
+    }
+  };
+  
 
   const columns = [
     {
@@ -162,22 +166,22 @@ const AddAutoawb = () => {
         <h2 className='font-semibold text-2xl mb-4 block text-center'>
           {isEditing ? 'Edit Auto Booking Airway Bill' : 'Add Auto Booking Airway Bill'}
         </h2>
-        <form onSubmit={saveOrUpdateAirway}>
+        <form>
           <div className='space-y-2'>
             <div>
-            <label>Courier Name</label>
-      <select
-        value={courierName}
-        onChange={(e) => setCourierName(e.target.value)}
-        className='w-full block border p-3 text-gray-600 rounded focus:outline-none focus:shadow-outline focus:border-blue-200'
-      >
-        <option value='' disabled>Select Courier Name</option>
-        {courierNames.map((name) => (
-          <option key={name._id} value={name.courierName}>
-            {name.courierName}
-          </option>
-        ))}
-      </select>
+              <label>Courier Name</label>
+              <select
+                value={courierName}
+                onChange={(e) => setCourierName(e.target.value)}
+                className='w-full block border p-3 text-gray-600 rounded focus:outline-none focus:shadow-outline focus:border-blue-200'
+              >
+                <option value='' disabled>Select Courier Name</option>
+                {courierNames.map((name) => (
+                  <option key={name._id} value={name.courierName}>
+                    {name.courierName}
+                  </option>
+                ))}
+              </select>
             </div>
             <div>
               <label>Status</label>
@@ -199,15 +203,29 @@ const AddAutoawb = () => {
                 className='w-full block border p-3 text-gray-600 rounded focus:outline-none focus:shadow-outline focus:border-blue-200 placeholder-grey-400'
               />
             </div>
-
-            <div>
-             {isButtonVisible&&(
+            <div className="flex space-x-4">
               <button
-                className='block w-full mt-6 bg-blue-700 text-white rounded-sm px-4 py-2 font-bold hover:bg-blue-600 hover:cursor-pointer'
-                type="submit"
+                type="button"
+                onClick={saveRecord}
+                className='block w-full bg-green-600 text-white rounded-sm px-4 py-2 font-bold hover:bg-green-500 hover:cursor-pointer'
               >
-                {isEditing ? 'Update' : 'Save'}
-              </button>)}
+                Save
+              </button>
+              <button
+                type="button"
+                onClick={uploadCSV}
+                className='block w-full bg-blue-700 text-white rounded-sm px-4 py-2 font-bold hover:bg-blue-600 hover:cursor-pointer'
+              >
+                Upload CSV
+              </button>
+            </div>
+            <div>
+              <label>Upload File</label>
+              <input
+                type="file"
+                onChange={(e) => setFile(e.target.files[0])} // Handle file selection
+                className='w-full block border p-3 text-gray-600 rounded focus:outline-none focus:shadow-outline focus:border-blue-200 placeholder-grey-400'
+              />
             </div>
           </div>
         </form>
@@ -225,6 +243,6 @@ const AddAutoawb = () => {
       </div>
     </div>
   );
-}
+};
 
 export default AddAutoawb;

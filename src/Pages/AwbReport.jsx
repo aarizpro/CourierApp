@@ -3,6 +3,7 @@ import Barcode from 'react-barcode';
 import { toast } from 'react-toastify';
 import axios from 'axios';
 import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 import courierImg1 from'../assets/rkaylogo.png';
 import amazon from '../assets/amazon.jpeg';
 import aramex from '../assets/aramex.png';
@@ -44,10 +45,20 @@ const AwbReport = () => {
   const [courierName,setCourierName]=useState('');
   const [couSite, setCouSite] = useState('');
   const messageTxt = 'Thank you.. Further Tracking Details Please visit ' +couSite;
-  
+  const [bookings, setBookings] = useState([]);
   
   const url ="https://api-services-jg4f.onrender.com/";
-  
+  const fetchCurrentDateBookings = async () => {
+    try {
+      const response = await axios.get(`${url}api/booking?sortBy[]=createdAt&sortOrder[]=desc`);
+      const allBookings = response.data;
+      setBookings(allBookings);
+    } catch (error) {
+      console.error('Failed to fetch current date bookings:', error);
+    }
+
+  };
+
   const fetchData=()=>{
     if(courierName==="Amazon"){
       setImgurl(amazon);
@@ -106,19 +117,28 @@ const AwbReport = () => {
    
    const downloadImage = async() => {
     if (printRef.current) {
-     await html2canvas(printRef.current)
-        .then((canvas) => {
-          const dataUrl = canvas.toDataURL('image/png');
-          const link = document.createElement('a');
-          link.download = 'booking-details.png';
-          link.href = dataUrl;
-          link.click();
-          toast.success('Downloaded');
-        })
-        .catch((error) => {
-          console.error('Failed to generate image:', error);
-          toast.error('Failed to download the image');
+      try {
+        // Capture the HTML element as a canvas
+        const canvas = await html2canvas(printRef.current);
+        const imgData = canvas.toDataURL('image/png');
+  
+        // Create a new PDF document
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'mm',
+          format: [168, 100] // Postcard size: 100mm x 148mm
         });
+  
+        // Add the image to the PDF
+        pdf.addImage(imgData, 'PNG', 0, 0, 168, 100); // Fit image to postcard size
+  
+        // Save the PDF
+        pdf.save('booking-details.pdf');
+        toast.success('Downloaded');
+      } catch (error) {
+        console.error('Failed to generate PDF:', error);
+        toast.error('Failed to download the PDF');
+      }
     }
     
   }
@@ -134,7 +154,7 @@ const AwbReport = () => {
   const fetchAwb = async () => {
     
     try {
-      const response = await axios.get(`${url}api/booking/search?field=airwayBill&value=${awbNo}`);
+      const response = await axios.get(`${url}api/booking/search?field[]=airwayBill&value[]=${awbNo}`);
       if (response.data.length > 0) {
         setAwbNo(response.data[0].airwayBill);
         setCourierName(response.data[0].courierName);
@@ -184,7 +204,12 @@ const AwbReport = () => {
     
   };
   useEffect(() => {
+    fetchCurrentDateBookings();
+  }, []); 
+  useEffect(() => {
+   
     if (courierName) {
+    
       fetchData();
     }
   }, [courierName]);
@@ -273,6 +298,35 @@ const showAwb=async()=>{
       </button>
      
     </div>
+    <div className="p-4">
+        <h2 className="text-xl font-semibold mb-4">Today's Bookings</h2>
+        <table className="min-w-full bg-white border border-gray-200">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b">Date</th>
+              <th className="py-2 px-4 border-b">Airway Bill</th>
+              <th className="py-2 px-4 border-b">From Mobile</th>
+              <th className="py-2 px-4 border-b">From Name</th>
+              <th className="py-2 px-4 border-b">To Mobile</th>
+              <th className="py-2 px-4 border-b">To Name</th>
+              <th className="py-2 px-4 border-b">Courier Name</th>
+            </tr>
+          </thead>
+          <tbody>
+            {bookings.map((booking, index) => (
+              <tr key={index}>
+                <td className="py-2 px-4 border-b">{booking.createdAt}</td>
+                <td className="py-2 px-4 border-b">{booking.airwayBill}</td>
+                <td className="py-2 px-4 border-b">{booking.fromMob}</td>
+                <td className="py-2 px-4 border-b">{booking.fromName}</td>
+                <td className="py-2 px-4 border-b">{booking.toMob}</td>
+                <td className="py-2 px-4 border-b">{booking.toName}</td>
+                <td className="py-2 px-4 border-b">{booking.courierName}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
     
     
