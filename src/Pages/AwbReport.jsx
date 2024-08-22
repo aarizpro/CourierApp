@@ -121,19 +121,23 @@ const AwbReport = () => {
         // Capture the HTML element as a canvas
         const canvas = await html2canvas(printRef.current);
         const imgData = canvas.toDataURL('image/png');
-  
-        // Create a new PDF document
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'mm',
-          format: [168, 100] // Postcard size: 100mm x 148mm
-        });
-  
-        // Add the image to the PDF
-        pdf.addImage(imgData, 'PNG', 0, 0, 168, 100); // Fit image to postcard size
-  
-        // Save the PDF
-        pdf.save('booking-details.pdf');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save('AirwayBill.pdf');
+
         toast.success('Downloaded');
       } catch (error) {
         console.error('Failed to generate PDF:', error);
@@ -143,6 +147,31 @@ const AwbReport = () => {
     
   }
   
+  const downloadImage1 = async() => {
+    if (printRef.current) {
+      try {
+        // Capture the HTML element as a canvas
+        const canvas = await html2canvas(printRef.current);
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const segmentHeight = pageHeight / 3;
+        for (let i = 0; i < 3; i++) {
+          const position = i * segmentHeight;
+          pdf.addImage(imgData, 'PNG', 0, position, imgWidth, segmentHeight);
+        }
+      
+      pdf.save('AirwayBill.pdf');
+
+        toast.success('Downloaded');
+      } catch (error) {
+        console.error('Failed to generate PDF:', error);
+        toast.error('Failed to download the PDF');
+      }
+    }
+    
+  }
   
   const handleAwb = (e) => {
     setAwbNo(e.target.value);
@@ -233,7 +262,7 @@ const showAwb=async()=>{
           type="text"
           value={awbNo}
           onChange={handleAwb}
-          className="col-span-1 p-2 bg-gray-100 rounded shadow"
+          className="col-span-1 p-2  bg-gray-100 rounded shadow"
         />
        <button
         onClick={showAwb}
@@ -245,8 +274,8 @@ const showAwb=async()=>{
 
     
       <div className="p-4">
-      <div ref={printRef}  className="border p-4 rounded  bg-white">
-        <div className="grid grid-cols-3 gap-4 items-center mb-4">
+      <div ref={printRef}  className="border p-2 rounded  bg-white">
+        <div className="grid grid-cols-3 gap-4 items-center mb-2">
           <img src={courierImg1} alt="Agency Logo" className="h-16"   />
           <div className="flex justify-center items-center">
             <Barcode value={awbNo1} format="CODE128" width={2} height={50} />
@@ -255,7 +284,7 @@ const showAwb=async()=>{
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-4 text-lg font-semibold">
+        <div className="grid grid-cols-3 gap-4 mb-2 text-lg font-semibold">
           <div>Date: {new Date().toLocaleDateString()}</div>
           
         </div>
@@ -292,9 +321,15 @@ const showAwb=async()=>{
       </div>
       <button
         onClick={downloadImage}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
+        className="mt-4 mr-4 px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
       >
         Download
+      </button>
+      <button
+        onClick={downloadImage1}
+        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded shadow hover:bg-blue-600"
+      >
+        3 Copies
       </button>
      
     </div>

@@ -8,7 +8,8 @@ const BookingReport = () => {
   const [data, setData] = useState([]);
   const [searchAwb, setSearchAwb] = useState("");
   const [searchMobile, setSearchMobile] = useState("");
-
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const url = "https://api-services-jg4f.onrender.com/";
 
   useEffect(() => {
@@ -25,11 +26,22 @@ const BookingReport = () => {
       toast.error('Failed to fetch data');
     }
   };
-
+  const filterDataByDate = () => {
+    const filteredData = data.filter(row => {
+      const rowDate = new Date(row.createdAt);
+      const start = fromDate ? new Date(fromDate) : new Date("1900-01-01");
+      const end = toDate ? new Date(toDate) : new Date();
+  
+      // Set end date time to the end of the day to include entries on that date
+      end.setHours(23, 59, 59, 999);
+  
+      return rowDate >= start && rowDate <= end;
+    });
+    setData(filteredData);
+  };
   const filteredData = data.filter(row => 
-  (searchAwb === "" || row.airwayBill.toLowerCase().includes(searchAwb.toLowerCase())) &&
-  (searchMobile === "" || row.fromMob.toLowerCase().includes(searchMobile.toLowerCase()) || row.toMob.toLowerCase().includes(searchMobile.toLowerCase()))
-);
+    (searchAwb === "" || row.airwayBill.toLowerCase().includes(searchAwb.toLowerCase()))
+  );
 
   console.log("Filtered Data:", filteredData); // Log filtered data
 
@@ -84,22 +96,10 @@ const BookingReport = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className='bg-white shadow-lg p-7 rounded-lg max-w-7xl w-full'>
-        <h1 className='text-2xl font-semibold mb-4 text-center'>
+        <h1 className='text-2xl font-semibold mb-2 text-center'>
           Booking Details
         </h1>
-
-        <div className="mb-4 flex justify-center space-x-4">
-          <input
-            type="text"
-            placeholder="Search by Awb No"
-            value={searchAwb}
-            onChange={(e) => setSearchAwb(e.target.value)}
-            className='p-2 border border-gray-300 rounded w-1/3'
-          />
-         
-        </div>
-
-        <div className="flex justify-end mb-4">
+        <div className="flex justify-end mb-2">
           <CSVLink
             data={filteredData}
             headers={csvHeaders}
@@ -109,13 +109,45 @@ const BookingReport = () => {
             Download CSV
           </CSVLink>
         </div>
-
-        <div className="flex-grow">
+        <div className="grid grid-cols-6 gap-4 mb-2">
+       
+          <label className=" p-2 bg-gray-100 rounded shadow">From Date:</label>
+          <input
+            type="date"
+            value={fromDate}
+            onChange={(e) => setFromDate(e.target.value)}
+            className=" p-2 bg-gray-100 rounded shadow"
+          />
+          <label className="p-2 bg-gray-100 rounded shadow">To Date:</label>
+          <input
+            type="date"
+            value={toDate}
+            onChange={(e) => setToDate(e.target.value)}
+            className=" p-2 bg-gray-100 rounded shadow"
+          />
+          <button
+            onClick={filterDataByDate}
+            className=" bg-blue-500 text-white px-4 py-2 rounded mt-2"
+          >
+            Show Data
+          </button>
+          <input
+            type="text"
+            placeholder="Search by Awb No"
+            value={searchAwb}
+            onChange={(e) => setSearchAwb(e.target.value)}
+            className='p-2 border border-gray-300 rounded '
+          />
+         
+        </div>
+       <div className="flex-grow">
           <DataTable
             columns={columns}
             data={filteredData}
             fixedHeader
             pagination
+            paginationPerPage={5} 
+            paginationRowsPerPageOptions={[5]}
             responsive
             highlightOnHover
             striped

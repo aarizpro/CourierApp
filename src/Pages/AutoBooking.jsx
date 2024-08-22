@@ -190,6 +190,8 @@ const AutoBooking = () => {
     }
    }
    const saveBooking=async()=>{
+    const dummyEmail1 = fromEmail === "" ? "--@--" : fromEmail;
+    const dummyEmail2 = toEmail === "" ? "--@--" : toEmail;
     generateImage();
     await new Promise(resolve => setTimeout(resolve, 5000));
     handleClick();
@@ -198,12 +200,12 @@ const AutoBooking = () => {
      const response = await axios.post(`${url}api/booking`,{
          toName:receiverName,
          toMob:receiverMobile,
-         toEmail:toEmail,
+         toEmail:dummyEmail2,
          toAddr:toAddr,
          toPincode:toPincode,
          fromName:senderName,
          fromMob:senderMobile,
-         fromEmail:fromEmail,
+         fromEmail:dummyEmail1,
          fromAddr:fromAddr,
          fromPincode:fromPincode,
          airwayBill:awbNo,
@@ -239,22 +241,25 @@ const AutoBooking = () => {
    const downloadImage = async() => {
     if (printRef.current) {
       try {
-        // Capture the HTML element as a canvas
         const canvas = await html2canvas(printRef.current);
         const imgData = canvas.toDataURL('image/png');
-  
-        // Create a new PDF document
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'mm',
-          format: [168, 100] // Postcard size: 100mm x 148mm
-        });
-  
-        // Add the image to the PDF
-        pdf.addImage(imgData, 'PNG', 0, 0, 168, 100); // Fit image to postcard size
-  
-        // Save the PDF
-        pdf.save('booking-details.pdf');
+        const pdf = new jsPDF('p', 'mm', 'a4');
+        const imgWidth = 210; // A4 width in mm
+        const pageHeight = 297; // A4 height in mm
+        const imgHeight = canvas.height * imgWidth / canvas.width;
+        let heightLeft = imgHeight;
+        let position = 0;
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+        while (heightLeft >= 0) {
+        position = heightLeft - imgHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
+      }
+      
+      pdf.save('AirwayBill.pdf');
+
         toast.success('Downloaded');
       } catch (error) {
         console.error('Failed to generate PDF:', error);
@@ -577,7 +582,7 @@ const AutoBooking = () => {
         </div>
       <div className="p-4">
       <div ref={printRef}  className="border p-4 rounded  bg-white">
-        <div className="grid grid-cols-3 gap-4 items-center mb-4">
+        <div className="grid grid-cols-3 gap-4 items-center mb-2">
           <img src={courierImg1} alt="Agency Logo" className="h-16"   />
           <div className="flex justify-center items-center">
             <Barcode value={awbNo} format="CODE128" width={2} height={50} />
@@ -586,12 +591,12 @@ const AutoBooking = () => {
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-4 text-lg font-semibold">
+        <div className="grid grid-cols-3 gap-4 mb-2 text-lg font-semibold">
           <div>Date: {fDate1}</div>
           
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+        <div className="grid grid-cols-2 gap-4 mb-2 text-sm">
           <div>
             From, <br/>
             {senderName}<br />
@@ -600,7 +605,7 @@ const AutoBooking = () => {
             {senderMobile}<br />
             {fromEmail}
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-4 text-lg font-bold">
+          <div className="grid grid-cols-2 gap-4 mb-2 text-2xl font-bold">
             To, <br/>
             {receiverName}<br />
             {toAddr}<br />
@@ -610,7 +615,7 @@ const AutoBooking = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-4 text-lg font-semibold">
+        <div className="grid grid-cols-4 gap-4 mb-2 text-lg font-semibold">
           <div>Shipment Type: {shipmentType}</div>
           <div>Weight : {weight}</div>
           <div>Quantity : {quantity}</div>
