@@ -26,6 +26,20 @@ import xpressbees from '../assets/xpressbees.jpeg';
 const Booking = () => {
   const location = useLocation();
   const printRef = useRef();
+  const senderNameRef = useRef(null);
+  const senderAddrRef = useRef(null);
+  const senderPinRef = useRef(null);
+  const senderEmailRef = useRef(null);
+  const recvMobRef = useRef(null);
+  const recvNameRef = useRef(null);
+  const recvAddrRef = useRef(null);
+  const recvPinRef = useRef(null);
+  const recvEmailRef = useRef(null);
+  const sType = useRef(null);
+  const sWeight = useRef(null);
+  const sQty = useRef(null);
+  const sAwb = useRef(null);
+  const sAmount = useRef(null);
   const { courierImg, courierName, courierSite } = location.state || {}; // Destructure the received state
   const messageTxt = 'Thank you.. Further Tracking Details Please visit ' + courierSite;
   const cDate1 = new Date();
@@ -53,6 +67,8 @@ const Booking = () => {
   const [instanceID, setInstanceID] = useState('');
   const [accessToken, setAccessToken] = useState('');
   const [dataFound, setDataFound] = useState(false);
+  
+  
   // const dummyEmail1="";
   // const dummyEmail2="";
   //const url = "http://localhost:5000/";
@@ -194,6 +210,93 @@ const Booking = () => {
   };
   const handleSenderMobileChange = (e) => {
     setSenderMobile(e.target.value);
+    // if (e.target.value.length === 10) {
+    //   senderNameRef.current.focus();
+    // }
+  };
+  const handleKeyPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      senderNameRef.current.focus();
+    }
+  };
+  const handleSNamePress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      senderAddrRef.current.focus();
+    }
+  };
+  const handleSAddrPress = (e) => {
+    if (( e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      senderPinRef.current.focus();
+    }
+  };
+  const handleSPinPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      senderEmailRef.current.focus();
+    }
+  };
+  const handleSEmailPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      recvMobRef.current.focus();
+    }
+  };
+  const handleRMobPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      recvNameRef.current.focus();
+    }
+  };
+  const handleRNamePress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      recvAddrRef.current.focus();
+    }
+  };
+  const handleRAddrPress = (e) => {
+    if (( e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      recvPinRef.current.focus();
+    }
+  };
+  const handleRPinPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      recvEmailRef.current.focus();
+    }
+  };
+  const handleREmailPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      sType.current.focus();
+    }
+  };
+  const handlesTypePress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      sWeight.current.focus();
+    }
+  };
+  const handlesWeightPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      sQty.current.focus();
+    }
+  };
+  const handlesQtyPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      sAmount.current.focus();
+    }
+  };
+  const handlesAmountPress = (e) => {
+    if ((e.key === 'Enter' || e.key === 'Tab') ) {
+      e.preventDefault(); // Prevent default Tab behavior
+      sAwb.current.focus();
+    }
   };
   const handleReceiverMobileChange = (e) => {
     setReceiverMobile(e.target.value);
@@ -417,7 +520,7 @@ const Booking = () => {
     }
   
   }, [awbNo]);
-
+  
  
   return (
     <div className="grid gap-2 p-2">
@@ -445,6 +548,7 @@ const Booking = () => {
           value={awbNo}
           onChange={handleAwb}
           className="col-span-2 p-2 bg-gray-100 rounded shadow"
+          ref={sAwb}
         />
       </div>
 
@@ -458,6 +562,7 @@ const Booking = () => {
             onChange={handleSenderMobileChange}
             className="w-full p-2 bg-gray-100 rounded shadow"
             maxLength={10}
+            onKeyDown={handleKeyPress}
           />
           {dataFound ? (
             <button className="bg-gray-500 text-white p-2 rounded shadow" disabled>
@@ -477,6 +582,8 @@ const Booking = () => {
             onChange={handleReceiverMobileChange}
             className="w-full p-2 bg-gray-100 rounded shadow"
             maxLength={10}
+            ref={recvMobRef}
+            onKeyDown={handleRMobPress}
           />
           {dataFound ? (
             <button className="bg-gray-500 text-white p-2 rounded shadow" disabled>
@@ -497,7 +604,8 @@ const Booking = () => {
             value={senderName}
             onChange={(e) => setSenderName(e.target.value)}
             className="w-full p-2 bg-gray-100 rounded shadow"
-           
+            ref={senderNameRef} 
+            onKeyDown={handleSNamePress}
           />
         
         </div>
@@ -508,6 +616,8 @@ const Booking = () => {
             value={receiverName}
             onChange={(e) => setReceiverName(e.target.value)}
             className="w-full p-2 bg-gray-100 rounded shadow"
+            ref={recvNameRef}
+            onKeyDown={handleRNamePress} 
           />
         
         </div>
@@ -520,13 +630,16 @@ const Booking = () => {
           onChange={(e) => setFromAddr(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
           rows="2"
-         
+          ref={senderAddrRef} 
+          onKeyDown={handleSAddrPress}
         />
         <textarea
           value={toAddr}
           onChange={(e) => setToAddr(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
           rows="2"
+          ref={recvAddrRef}
+          onKeyDown={handleRAddrPress} 
         />
       </div>
 
@@ -538,6 +651,8 @@ const Booking = () => {
           value={fromPincode}
           onChange={(e) => setFromPincode(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={senderPinRef}
+          onKeyDown={handleSPinPress}
         />
         <label className="col-span-1 p-2 bg-gray-100 rounded shadow">To Pincode:</label>
         <input
@@ -545,6 +660,8 @@ const Booking = () => {
           value={toPincode}
           onChange={(e) => setToPincode(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={recvPinRef}
+          onKeyDown={handleRPinPress}
         />
       </div>
 
@@ -555,6 +672,8 @@ const Booking = () => {
           value={fromEmail}
           onChange={(e) => setFromEmail(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={senderEmailRef}
+          onKeyDown={handleSEmailPress}
         />
         <label className="col-span-1 p-2 bg-gray-100 rounded shadow">To Email:</label>
         <input
@@ -562,6 +681,8 @@ const Booking = () => {
           value={toEmail}
           onChange={(e) => setToEmail(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={recvEmailRef}
+          onKeyDown={handleREmailPress}
         />
       </div>
 
@@ -573,6 +694,8 @@ const Booking = () => {
           value={shipmentType}
           onChange={(e) => setShipmentType(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={sType}
+          onKeyDown={handlesTypePress}
         />
         <label className="col-span-1 p-2 bg-gray-100 rounded shadow">Quantity:</label>
         <input
@@ -580,6 +703,8 @@ const Booking = () => {
           value={quantity}
           onChange={(e) => setQuantity(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={sQty}
+          onKeyDown={handlesQtyPress}
         />
       </div>
 
@@ -590,6 +715,8 @@ const Booking = () => {
           value={weight}
           onChange={(e) => setWeight(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={sWeight}
+          onKeyDown={handlesWeightPress}
         />
         <label className="col-span-1 p-2 bg-gray-100 rounded shadow">Amount:</label>
         <input
@@ -597,6 +724,8 @@ const Booking = () => {
           value={amount}
           onChange={(e) => setAmount(e.target.value)}
           className="col-span-3 p-2 bg-gray-100 rounded shadow"
+          ref={sAmount}
+          onKeyDown={handlesAmountPress}
         />
       </div>
 
@@ -616,49 +745,59 @@ const Booking = () => {
         )}
         </div>
       <div className="p-4 ">
-      <div ref={printRef}  className="border p-4 rounded  bg-white">
-        <div className="grid grid-cols-3 gap-4 items-center mb-2">
+      <div ref={printRef}  className="border-2 border-black border-solid  p-4 rounded  bg-white">
+        <div className="border-2 border-black border-solid grid grid-cols-3 gap-4 items-center mb-2">
           <img src={courierImg1} alt="Agency Logo" className="h-16"   />
-          <div className="flex justify-center items-center">
+          <div className="border-2 border-black border-solid flex justify-center items-center">
             <Barcode value={awbNo} format="CODE128" width={2} height={50} />
           </div>
           <img src={imgurl} alt="Courier Logo" className="h-16" 
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-2 text-lg font-semibold">
+        <div className=" grid grid-cols-3 gap-4 mb-2 text-lg font-semibold">
           <div>Date: {fDate1}</div>
           
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-2 text-sm">
-          <div>
+        <div className="grid grid-cols-2 gap-4  text-sm mb-2">
+          <div className='border-2 border-black border-solid'>
+            <div>
             From, <br/>
             {senderName}<br />
             {fromAddr}<br />
             {fromPincode}<br />
             {senderMobile}<br />
             {fromEmail}
+            </div>
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-2 text-2xl font-bold">
+          
+          <div className='border-2 border-black border-solid text-2xl font-bold mb-2'>
+            <div>
             To, <br/>
             {receiverName}<br />
             {toAddr}<br />
             {toPincode}<br />
             {receiverMobile}<br />
             {toEmail}
+            </div>
           </div>
+          
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-2 text-lg font-semibold">
-          <div>Shipment Type: {shipmentType}</div>
-          <div>Weight : {weight}</div>
-          <div>Quantity : {quantity}</div>
-          <div>Amount : {amount}</div>
+        <div className="grid grid-cols-4 gap-4 text-lg font-semibold mb-2">
+          
+          <div className='border-2 border-black border-solid'>Shipment Type: {shipmentType}</div>
+          <div className='border-2 border-black border-solid'>Weight : {weight}</div>
+          <div className='border-2 border-black border-solid'>Quantity : {quantity}</div>
+          <div className='border-2 border-black border-solid'>Amount : {amount}</div>
+       
         </div>
 
-        <div className="text-lg font-semibold text-center">
+        <div className="border-2 border-black border-solid mb-2 text-lg font-semibold text-center">
+          <div>
           {messageTxt}
+          </div>
         </div>
       </div>
       {/* <button

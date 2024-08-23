@@ -274,8 +274,8 @@ const showAwb=async()=>{
 
     
       <div className="p-4">
-      <div ref={printRef}  className="border p-2 rounded  bg-white">
-        <div className="grid grid-cols-3 gap-4 items-center mb-2">
+      <div ref={printRef}  className="border-2 border-black border-solid p-2 rounded  bg-white">
+        <div className="border-2 border-black border-solid grid grid-cols-3 gap-4 items-center mb-2">
           <img src={courierImg1} alt="Agency Logo" className="h-16"   />
           <div className="flex justify-center items-center">
             <Barcode value={awbNo1} format="CODE128" width={2} height={50} />
@@ -284,12 +284,12 @@ const showAwb=async()=>{
           />
         </div>
 
-        <div className="grid grid-cols-3 gap-4 mb-2 text-lg font-semibold">
+        <div className="border-2 border-black border-solid grid grid-cols-3 gap-4 mb-2 text-lg font-semibold">
           <div>Date: {new Date().toLocaleDateString()}</div>
           
         </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+        <div className="border-2 border-black border-solid grid grid-cols-2 gap-4 mb-4 text-sm">
           <div>
             From, <br/>
             {senderName}<br />
@@ -298,7 +298,7 @@ const showAwb=async()=>{
             {senderMobile}<br />
             {fromEmail}
           </div>
-          <div className="grid grid-cols-2 gap-4 mb-4 text-lg font-bold">
+          <div className="border-2 border-black border-solid text-lg font-bold">
             To, <br/>
             {receiverName}<br />
             {toAddr}<br />
@@ -308,7 +308,7 @@ const showAwb=async()=>{
           </div>
         </div>
 
-        <div className="grid grid-cols-4 gap-4 mb-4 text-lg font-semibold">
+        <div className="border-2 border-black border-solid grid grid-cols-4 gap-4 mb-4 text-lg font-semibold">
           <div>Shipment Type: {shipmentType}</div>
           <div>Weight : {weight}</div>
           <div>Quantity : {quantity}</div>
