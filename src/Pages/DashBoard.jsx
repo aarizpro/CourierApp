@@ -5,7 +5,8 @@ import { Link } from 'react-router-dom';
 const DashBoard = () => {
   const [courier, setCourier]= useState([]);
   const [isLoading,setIsLoading]= useState(false);
-  const url ="https://api-services-jg4f.onrender.com/";
+  //const url ="https://api-services-jg4f.onrender.com/";
+  const url ="https://allapi-4fmi.onrender.com/";
   const getCourier=async()=>{
     try {
       setIsLoading(true);

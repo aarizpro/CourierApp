@@ -9,8 +9,9 @@ const Greetings = () => {
   const [cimgurl, setCimgurl] = useState("");
   const [customers, setCustomers] = useState([]); // State to store customer data
 
-  const url = "https://api-services-jg4f.onrender.com/";
-  const url1 = "https://awsupload.onrender.com/";
+ //const url ="https://api-services-jg4f.onrender.com/";
+ const url ="https://allapi-4fmi.onrender.com/";
+ const url1 = "https://awsupload.onrender.com/";
 
   useEffect(() => {
     fetchProfile();

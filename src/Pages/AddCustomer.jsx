@@ -15,8 +15,9 @@ const AddCustomer = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [search, setSearch] = useState("");
-  const url = "https://api-services-jg4f.onrender.com/";
-
+ //const url ="https://api-services-jg4f.onrender.com/";
+ const url ="https://allapi-4fmi.onrender.com/";
+  
   useEffect(() => {
     fetchData();
   }, []);

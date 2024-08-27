@@ -13,9 +13,9 @@ const AddAutoawb = () => {
   const [file, setFile] = useState(null); // State to hold selected file
   const [isEditing, setIsEditing] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const url = "https://api-services-jg4f.onrender.com/";
-  //const url = "http://localhost:5000/";
-  useEffect(() => {
+  //const url ="https://api-services-jg4f.onrender.com/";
+  const url ="https://allapi-4fmi.onrender.com/";
+   useEffect(() => {
     fetchData();
     fetchCourierNames();
   }, []);

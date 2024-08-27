@@ -47,7 +47,8 @@ const AwbReport = () => {
   const messageTxt = 'Thank you.. Further Tracking Details Please visit ' +couSite;
   const [bookings, setBookings] = useState([]);
   
-  const url ="https://api-services-jg4f.onrender.com/";
+  //const url ="https://api-services-jg4f.onrender.com/";
+  const url ="https://allapi-4fmi.onrender.com/";
   const fetchCurrentDateBookings = async () => {
     try {
       const response = await axios.get(`${url}api/booking?sortBy[]=createdAt&sortOrder[]=desc`);

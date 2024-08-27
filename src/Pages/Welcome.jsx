@@ -7,8 +7,9 @@ const Welcome = () => {
     const [instanceId,setInstanceID]= useState("");
     const [accessToken,setAccessToken]= useState("");
     const [message,setMessage]= useState("Welcome to Dingdong Courier We are Happy to Serve you...");
-    const url ="https://api-services-jg4f.onrender.com/";
-
+   //const url ="https://api-services-jg4f.onrender.com/";
+   const url ="https://allapi-4fmi.onrender.com/";
+  
     useEffect(() => {
         fetchProfile();
       }, []);

@@ -67,8 +67,9 @@ const AutoBooking = () => {
   const sAwb = useRef(null);
   const sAmount = useRef(null);
   //const url = "http://localhost:5000/";
-  const url ="https://api-services-jg4f.onrender.com/";
-  const navigate =useNavigate();
+ //const url ="https://api-services-jg4f.onrender.com/";
+ const url ="https://allapi-4fmi.onrender.com/";
+ const navigate =useNavigate();
   // Function to fetch data for sender's address
   const handleKeyPress = (e) => {
     if ((e.key === 'Enter' || e.key === 'Tab') ) {

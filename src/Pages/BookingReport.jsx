@@ -10,8 +10,9 @@ const BookingReport = () => {
   const [searchMobile, setSearchMobile] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const url = "https://api-services-jg4f.onrender.com/";
-
+  //const url ="https://api-services-jg4f.onrender.com/";
+  const url ="https://allapi-4fmi.onrender.com/";
+  
   useEffect(() => {
     fetchData();
   }, []);

@@ -11,9 +11,9 @@ const AddCourier = () => {
   const [file, setFile] = useState(null); // Add state for file
   const [isloading, setIsloading] = useState(false);
   const navigate = useNavigate();
-  const url = "https://api-services-jg4f.onrender.com/";
-  const url1="https://awsupload.onrender.com/";
-  const saveCourier = async (e) => {
+ //const url ="https://api-services-jg4f.onrender.com/";
+ const url ="https://allapi-4fmi.onrender.com/";
+ const saveCourier = async (e) => {
     e.preventDefault();
     if (cname === "" || csite === "" || cimgurl === "" || cdesc === "") {
       alert("Enter all Fields");

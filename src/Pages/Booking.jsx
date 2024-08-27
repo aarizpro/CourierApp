@@ -72,8 +72,9 @@ const Booking = () => {
   // const dummyEmail1="";
   // const dummyEmail2="";
   //const url = "http://localhost:5000/";
-  const url ="https://api-services-jg4f.onrender.com/";
-  const navigate =useNavigate();
+ //const url ="https://api-services-jg4f.onrender.com/";
+ const url ="https://allapi-4fmi.onrender.com/";
+ const navigate =useNavigate();
   // Function to fetch data for sender's address
   
   const fetchMobno = async () => {

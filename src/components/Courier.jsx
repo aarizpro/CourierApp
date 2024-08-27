@@ -4,7 +4,8 @@ import { HiArchive } from "react-icons/hi";
 import { toast } from 'react-toastify';
 import axios from 'axios';
 const Courier = ({courier }) => {
-  const url ="https://api-services-jg4f.onrender.com/";
+  //const url ="https://api-services-jg4f.onrender.com/";
+  const url ="https://allapi-4fmi.onrender.com/";
   const courierDelete=async()=>{
     try {
       const response = await axios.delete(`${url}api/courier/${courier._id}`);

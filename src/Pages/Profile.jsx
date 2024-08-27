@@ -10,8 +10,9 @@ const Profile = () => {
   const [agencyImgurl,setAgencyImgurl]= useState("");
   const [agencyID,setAgencyID]= useState("");
   const [isloading,setIsloading]= useState(false);
-  const url ="https://api-services-jg4f.onrender.com/";
-  const saveCourier=async(e)=>{
+ //const url ="https://api-services-jg4f.onrender.com/";
+ const url ="https://allapi-4fmi.onrender.com/";
+ const saveCourier=async(e)=>{
     e.preventDefault();
     if(agencyName===""||instanceId===""||accessToken===""||agencyEmail===""||agencyImgurl===""){
       alert("Enter all Fields");
